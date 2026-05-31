@@ -323,44 +323,172 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const chars = "01{}[]<>/=+-;const let fn return import class";
-        let columns = [];
-
-        const build = (width, height) => {
-            const count = Math.max(8, Math.floor(width / 28));
-            columns = Array.from({ length: count }, (_, i) => ({
-                x: (i + 0.5) * (width / count),
-                y: rand(-height, 0),
-                speed: rand(40, 110),
-                size: rand(10, 14),
-                text: chars[Math.floor(Math.random() * chars.length)]
-            }));
+        const colors = {
+            bg: "#0d1117",
+            gutter: "#161b22",
+            lineNum: "#484f58",
+            text: "#c9d1d9",
+            keyword: "#ff7b72",
+            type: "#79c0ff",
+            fn: "#d2a8ff",
+            string: "#a5d6ff",
+            comment: "#8b949e",
+            number: "#79c0ff",
+            bracket: "#ffa657",
+            cursor: "#58a6ff"
         };
 
-        const controller = api.init((ctx, w, h, time, isStatic, dt) => {
-            if (!columns.length) {
-                build(w, h);
+        const codeLines = [
+            [{ t: "// model training loop", c: colors.comment }],
+            [{ t: "import", c: colors.keyword }, { t: " torch", c: colors.text }],
+            [{ t: "import", c: colors.keyword }, { t: " numpy", c: colors.keyword }, { t: " as np", c: colors.text }],
+            [],
+            [{ t: "def", c: colors.keyword }, { t: " train", c: colors.fn }, { t: "(model, loader):", c: colors.text }],
+            [{ t: "    model", c: colors.text }, { t: ".train", c: colors.fn }, { t: "()", c: colors.bracket }],
+            [{ t: "    for", c: colors.keyword }, { t: " epoch", c: colors.text }, { t: " in", c: colors.keyword }, { t: " range", c: colors.fn }, { t: "(", c: colors.bracket }, { t: "10", c: colors.number }, { t: "):", c: colors.bracket }],
+            [{ t: "        loss = ", c: colors.text }, { t: "0.0", c: colors.number }],
+            [{ t: "        for", c: colors.keyword }, { t: " x, y", c: colors.text }, { t: " in", c: colors.keyword }, { t: " loader:", c: colors.text }],
+            [{ t: "            pred = model(x)", c: colors.text }],
+            [{ t: "            loss += criterion(pred, y)", c: colors.text }],
+            [{ t: "        print", c: colors.fn }, { t: "(", c: colors.bracket }, { t: "f\"epoch={epoch} loss={loss:.4f}\"", c: colors.string }, { t: ")", c: colors.bracket }],
+            [{ t: "    return", c: colors.keyword }, { t: " loss", c: colors.text }],
+            [],
+            [{ t: "class", c: colors.keyword }, { t: " Net", c: colors.type }, { t: "(nn.Module):", c: colors.text }],
+            [{ t: "    def", c: colors.keyword }, { t: " __init__", c: colors.fn }, { t: "(self):", c: colors.text }],
+            [{ t: "        super", c: colors.text }, { t: "().__init__", c: colors.bracket }],
+            [{ t: "        self.fc = nn.Linear(", c: colors.text }, { t: "128", c: colors.number }, { t: ", ", c: colors.text }, { t: "10", c: colors.number }, { t: ")", c: colors.text }],
+            [],
+            [{ t: "const", c: colors.keyword }, { t: " buildApp", c: colors.fn }, { t: " = () => {", c: colors.text }],
+            [{ t: "  const [count, setCount] = useState(", c: colors.text }, { t: "0", c: colors.number }, { t: ");", c: colors.text }],
+            [{ t: "  return <App title=", c: colors.text }, { t: "\"Portfolio\"", c: colors.string }, { t: " />;", c: colors.text }],
+            [{ t: "};", c: colors.bracket }],
+            [],
+            [{ t: "#include ", c: colors.keyword }, { t: "<iostream>", c: colors.string }],
+            [{ t: "int", c: colors.keyword }, { t: " main", c: colors.fn }, { t: "() {", c: colors.text }],
+            [{ t: "    std::cout << ", c: colors.text }, { t: "\"Hello, World!\"", c: colors.string }, { t: " << std::endl;", c: colors.text }],
+            [{ t: "    return ", c: colors.text }, { t: "0", c: colors.number }, { t: ";", c: colors.text }],
+            [{ t: "}", c: colors.bracket }]
+        ];
+
+        let scrollY = 0;
+        let fontSize = 11;
+        let lineHeight = 16;
+        let padX = 12;
+        let gutterW = 28;
+
+        const measureLayout = (w, h) => {
+            fontSize = Math.max(9, Math.min(12, Math.floor(w / 42)));
+            lineHeight = fontSize + 5;
+            padX = Math.max(10, w * 0.04);
+            gutterW = fontSize + 18;
+        };
+
+        const drawTokens = (ctx, tokens, x, y) => {
+            let cursorX = x;
+            ctx.font = `${fontSize}px "Consolas", "Courier New", monospace`;
+            tokens.forEach((token) => {
+                ctx.fillStyle = token.c;
+                ctx.fillText(token.t, cursorX, y);
+                cursorX += ctx.measureText(token.t).width;
+            });
+            return cursorX;
+        };
+
+        api.init((ctx, w, h, time, isStatic, dt) => {
+            measureLayout(w, h);
+
+            const step = isStatic ? 0 : (dt || 16) * 0.06;
+            scrollY += step;
+
+            const totalHeight = codeLines.length * lineHeight + h * 0.5;
+            if (scrollY > totalHeight) {
+                scrollY = 0;
             }
 
-            ctx.fillStyle = "rgba(8, 11, 20, 0.18)";
+            ctx.fillStyle = colors.bg;
             ctx.fillRect(0, 0, w, h);
 
-            const step = isStatic ? 0 : (dt || 16) * 0.001;
-            columns.forEach((column) => {
-                column.y += column.speed * step;
-                if (column.y > h + 20) {
-                    column.y = rand(-80, -10);
-                    column.text = chars[Math.floor(Math.random() * chars.length)];
+            const panelX = padX;
+            const panelY = padX;
+            const panelW = w - padX * 2;
+            const panelH = h - padX * 2;
+            const radius = 8;
+
+            ctx.fillStyle = colors.gutter;
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(panelX, panelY, panelW, panelH, radius);
+            } else {
+                ctx.rect(panelX, panelY, panelW, panelH);
+            }
+            ctx.fill();
+
+            ctx.fillStyle = "#21262d";
+            ctx.fillRect(panelX, panelY, panelW, 22);
+
+            ["#ff5f57", "#febc2e", "#28c840"].forEach((dotColor, i) => {
+                ctx.fillStyle = dotColor;
+                ctx.beginPath();
+                ctx.arc(panelX + 14 + i * 14, panelY + 11, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = "#8b949e";
+            ctx.font = `600 ${Math.max(9, fontSize - 1)}px sans-serif`;
+            ctx.fillText("main.py  ·  app.tsx  ·  main.cpp", panelX + 52, panelY + 15);
+
+            const codeTop = panelY + 28;
+            const codeLeft = panelX + gutterW + 6;
+            const codeRight = panelX + panelW - 8;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(panelX + 1, codeTop, panelW - 2, panelH - 30);
+            ctx.clip();
+
+            ctx.fillStyle = "rgba(22, 27, 34, 0.95)";
+            ctx.fillRect(panelX, codeTop, gutterW, panelH - 30);
+
+            const t = time * 0.001;
+            const activeLine = Math.floor((scrollY / lineHeight + codeLines.length * 0.35)) % Math.max(1, codeLines.length);
+
+            codeLines.forEach((tokens, index) => {
+                const y = codeTop + index * lineHeight - scrollY + lineHeight;
+                if (y < codeTop - lineHeight || y > panelY + panelH) {
+                    return;
                 }
 
-                ctx.fillStyle = "rgba(90, 255, 170, 0.75)";
-                ctx.font = `${column.size}px monospace`;
-                ctx.fillText(column.text, column.x, column.y);
-            });
-        });
+                ctx.fillStyle = colors.lineNum;
+                ctx.font = `${fontSize}px "Consolas", "Courier New", monospace`;
+                const lineLabel = String(index + 1).padStart(2, " ");
+                ctx.fillText(lineLabel, panelX + 8, y);
 
-        controller.setOnResize((width, height) => {
-            build(width, height);
+                if (tokens.length) {
+                    const endX = drawTokens(ctx, tokens, codeLeft, y);
+
+                    if (index === activeLine && !isStatic) {
+                        const blink = Math.sin(t * 5) > 0;
+                        if (blink) {
+                            ctx.fillStyle = colors.cursor;
+                            ctx.fillRect(endX + 2, y - fontSize + 2, 2, fontSize);
+                        }
+                    }
+                }
+            });
+
+            const scanY = codeTop + ((scrollY * 0.4) % (panelH - 40));
+            const scanGrad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
+            scanGrad.addColorStop(0, "rgba(88, 166, 255, 0)");
+            scanGrad.addColorStop(0.5, "rgba(88, 166, 255, 0.06)");
+            scanGrad.addColorStop(1, "rgba(88, 166, 255, 0)");
+            ctx.fillStyle = scanGrad;
+            ctx.fillRect(panelX, scanY - 30, panelW, 60);
+
+            ctx.restore();
+
+            ctx.strokeStyle = "rgba(48, 54, 61, 0.9)";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(panelX + 0.5, panelY + 0.5, panelW - 1, panelH - 1);
         });
     };
 
