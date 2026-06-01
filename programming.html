@@ -7,21 +7,123 @@
     <title>プログラミング | Portfolio</title>
     <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/programming.css">
     <script src="js/script.js" defer></script>
+    <script src="js/programming.js" defer></script>
 </head>
 <body>
-    <header class="hero">
-        <div class="container">
+    <header class="hero prog-hero">
+        <canvas class="prog-hero-canvas" aria-hidden="true"></canvas>
+        <div class="prog-hero-glow" aria-hidden="true"></div>
+        <div class="container prog-hero-content">
             <h1>プログラミング</h1>
-            <p>設計・実装・改善の積み重ね</p>
+            <p>アルゴリズム・Web開発・研究用ツールまで、設計から改善まで一貫して取り組んでいます</p>
         </div>
     </header>
+
     <main class="detail-main">
         <section class="detail-card">
-            <h2>取り組んでいる技術</h2>
-            <p>C/C++、Python、JavaScript/TypeScriptを中心に、アルゴリズム学習からWebアプリ開発まで幅広く取り組んでいます。</p>
-            <p>機能追加だけでなく、可読性や保守性を意識したコード設計、テスト、リファクタリングも重視しています。</p>
-            <p>今後はAIアプリケーション開発とフロントエンド表現を組み合わせた制作にも取り組む予定です。</p>
+            <h2>開発の方針</h2>
+            <p>「動けばよい」ではなく、後から読みやすく・直しやすいコードを書くことを重視しています。要件を整理してから実装し、小さな単位で動作確認しながら進めることで、バグの早期発見と仕様のブレ防止につなげています。</p>
+            <p>研究では Python と PyTorch を、Web 制作では HTML/CSS/JavaScript を、基礎学習では C/C++ を中心に使い分け、用途に合った言語選定を意識しています。</p>
+        </section>
+
+        <section class="detail-card prog-stack-card">
+            <h2>言語・技術スタック</h2>
+            <p>日常的に触れている技術を、用途別に整理しています。</p>
+            <div class="prog-stack-grid">
+                <div class="prog-stack-group">
+                    <h3>言語</h3>
+                    <ul class="prog-tags">
+                        <li>C / C++</li>
+                        <li>Python</li>
+                        <li>JavaScript</li>
+                        <li>TypeScript</li>
+                        <li>HTML / CSS</li>
+                    </ul>
+                </div>
+                <div class="prog-stack-group">
+                    <h3>研究・データ</h3>
+                    <ul class="prog-tags">
+                        <li>PyTorch</li>
+                        <li>NumPy</li>
+                        <li>pandas</li>
+                        <li>matplotlib</li>
+                        <li>Jupyter</li>
+                    </ul>
+                </div>
+                <div class="prog-stack-group">
+                    <h3>Web・ツール</h3>
+                    <ul class="prog-tags">
+                        <li>Git / GitHub</li>
+                        <li>VS Code</li>
+                        <li>Node.js</li>
+                        <li>REST API</li>
+                        <li>レスポンシブUI</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="detail-card prog-projects-card">
+            <h2>取り組み事例</h2>
+            <div class="prog-projects">
+                <article class="prog-project">
+                    <h3>深層学習 実験スクリプト</h3>
+                    <p>学習ループ・ログ出力・チェックポイント保存をモジュール化し、ハイパーパラメータ変更時の再現性を確保。設定ファイル（YAML）で実験条件を管理しています。</p>
+                    <p class="prog-meta"><span>Python</span><span>PyTorch</span></p>
+                </article>
+                <article class="prog-project">
+                    <h3>ポートフォリオ Web サイト</h3>
+                    <p>トップページのスクロール演出、各詳細ページのビジュアルエフェクト、画像モーダルなどを実装。CSS と Canvas を組み合わせ、軽量な表現を目指しました。</p>
+                    <p class="prog-meta"><span>HTML</span><span>CSS</span><span>JavaScript</span></p>
+                </article>
+                <article class="prog-project">
+                    <h3>アルゴリズム・基礎実装</h3>
+                    <p>ソート、探索、データ構造（スタック・キュー・木）を C/C++ で実装。計算量の理解と、メモリ・ポインタの扱いに慣れるための演習を継続しています。</p>
+                    <p class="prog-meta"><span>C++</span><span>競技プログラミング基礎</span></p>
+                </article>
+            </div>
+        </section>
+
+        <section class="detail-card prog-flow-card">
+            <h2>開発の流れ</h2>
+            <ol class="prog-flow">
+                <li><strong>要件整理</strong> — 作るもの・入力/出力・制約をメモにまとめる</li>
+                <li><strong>設計</strong> — 関数分割、データ構造、画面構成を決める</li>
+                <li><strong>実装</strong> — 小さな機能から順にコミットしながら進める</li>
+                <li><strong>テスト</strong> — 正常系・異常系を確認し、ログで挙動を追う</li>
+                <li><strong>リファクタリング</strong> — 命名・重複削減・可読性の改善</li>
+            </ol>
+        </section>
+
+        <section class="detail-card prog-demo-card">
+            <h2>コード例</h2>
+            <p>研究でよく書く学習ループのイメージです（表示用のサンプルコード）。</p>
+            <div class="prog-editor" data-prog-editor>
+                <div class="prog-editor-bar">
+                    <span></span><span></span><span></span>
+                    <p>train.py</p>
+                </div>
+                <pre class="prog-code-block"><code><span class="tok-comment"># PyTorch: 1エポックの学習</span>
+<span class="tok-kw">def</span> <span class="tok-fn">train_one_epoch</span>(model, loader, optimizer, criterion):
+    model.<span class="tok-fn">train</span>()
+    total_loss = <span class="tok-num">0.0</span>
+    <span class="tok-kw">for</span> inputs, targets <span class="tok-kw">in</span> loader:
+        optimizer.<span class="tok-fn">zero_grad</span>()
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+        loss.<span class="tok-fn">backward</span>()
+        optimizer.<span class="tok-fn">step</span>()
+        total_loss += loss.<span class="tok-fn">item</span>()
+    <span class="tok-kw">return</span> total_loss / <span class="tok-fn">len</span>(loader)</code></pre>
+            </div>
+
+            <div class="prog-terminal" data-prog-terminal>
+                <div class="prog-terminal-bar">terminal</div>
+                <pre class="prog-terminal-body"><code></code></pre>
+            </div>
+
             <a class="back-link" href="index.html">トップページへ戻る</a>
         </section>
     </main>
