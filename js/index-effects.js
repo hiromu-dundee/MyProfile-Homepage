@@ -253,67 +253,224 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const project = (point, w, h, angleX, angleY) => {
-            let x = point[0];
-            let y = point[1];
-            let z = point[2];
+        const rotateY = (x, y, z, a) => {
+            const c = Math.cos(a);
+            const s = Math.sin(a);
+            return [x * c - z * s, y, x * s + z * c];
+        };
 
-            const cosY = Math.cos(angleY);
-            const sinY = Math.sin(angleY);
-            const nx = x * cosY - z * sinY;
-            const nz = x * sinY + z * cosY;
-            x = nx;
-            z = nz;
+        const rotateX = (x, y, z, a) => {
+            const c = Math.cos(a);
+            const s = Math.sin(a);
+            return [x, y * c - z * s, y * s + z * c];
+        };
 
-            const cosX = Math.cos(angleX);
-            const sinX = Math.sin(angleX);
-            const ny = y * cosX - z * sinX;
-            const nz2 = y * sinX + z * cosX;
-            y = ny;
-            z = nz2;
+        const project = (point, w, h, angleX, angleY, cx, cy, size) => {
+            let [x, y, z] = point;
+            [x, y, z] = rotateY(x, y, z, angleY);
+            [x, y, z] = rotateX(x, y, z, angleX);
 
-            const scale = 120 / (z + 4);
+            const base = Math.min(w, h) * 0.11 * size;
+            const depth = 4.5 + z * 0.35;
             return {
-                x: w * 0.5 + x * scale,
-                y: h * 0.5 + y * scale
+                x: cx + x * (base * 2.2) / depth,
+                y: cy + y * (base * 2.2) / depth,
+                z
             };
         };
 
-        const cubeVertices = [
-            [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
-            [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
-        ];
-        const cubeEdges = [
-            [0, 1], [1, 2], [2, 3], [3, 0],
-            [4, 5], [5, 6], [6, 7], [7, 4],
-            [0, 4], [1, 5], [2, 6], [3, 7]
+        const shapeDefs = {
+            cube: {
+                vertices: [
+                    [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+                    [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+                ],
+                edges: [
+                    [0, 1], [1, 2], [2, 3], [3, 0],
+                    [4, 5], [5, 6], [6, 7], [7, 4],
+                    [0, 4], [1, 5], [2, 6], [3, 7]
+                ]
+            },
+            pyramid: {
+                vertices: [
+                    [-1.1, -0.9, -1.1], [1.1, -0.9, -1.1], [1.1, -0.9, 1.1], [-1.1, -0.9, 1.1],
+                    [0, 1.3, 0]
+                ],
+                edges: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 4], [2, 4], [3, 4]]
+            },
+            octahedron: {
+                vertices: [
+                    [0, 1.4, 0], [0, -1.4, 0],
+                    [1.4, 0, 0], [-1.4, 0, 0],
+                    [0, 0, 1.4], [0, 0, -1.4]
+                ],
+                edges: [
+                    [0, 2], [0, 3], [0, 4], [0, 5],
+                    [1, 2], [1, 3], [1, 4], [1, 5],
+                    [2, 4], [4, 3], [3, 5], [5, 2]
+                ]
+            },
+            tetrahedron: {
+                vertices: [
+                    [1, 1, 1], [-1, -1, 1], [-1, 1, -1], [1, -1, -1]
+                ],
+                edges: [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]]
+            },
+            diamond: {
+                vertices: [
+                    [0, 1.5, 0], [0, -1.5, 0],
+                    [1, 0, 0], [-1, 0, 0],
+                    [0, 0, 1], [0, 0, -1],
+                    [0.9, 0.9, 0], [-0.9, 0.9, 0], [0.9, -0.9, 0], [-0.9, -0.9, 0]
+                ],
+                edges: [
+                    [0, 2], [0, 3], [0, 4], [0, 5],
+                    [1, 2], [1, 3], [1, 4], [1, 5],
+                    [2, 4], [4, 3], [3, 5], [5, 2],
+                    [0, 6], [0, 7], [1, 8], [1, 9]
+                ]
+            }
+        };
+
+        const buildCylinder = (segments = 14) => {
+            const vertices = [];
+            const edges = [];
+            const top = [];
+            const bottom = [];
+            for (let i = 0; i < segments; i += 1) {
+                const a = (i / segments) * Math.PI * 2;
+                const x = Math.cos(a) * 1.1;
+                const z = Math.sin(a) * 1.1;
+                top.push([x, 1, z]);
+                bottom.push([x, -1, z]);
+            }
+            vertices.push(...top, ...bottom);
+            for (let i = 0; i < segments; i += 1) {
+                const next = (i + 1) % segments;
+                edges.push([i, next], [i + segments, next + segments], [i, i + segments]);
+            }
+            return { vertices, edges };
+        };
+
+        const buildSphere = (rings = 8, segments = 12) => {
+            const vertices = [];
+            const edges = [];
+            for (let r = 0; r <= rings; r += 1) {
+                const phi = (r / rings) * Math.PI;
+                const row = [];
+                for (let s = 0; s < segments; s += 1) {
+                    const theta = (s / segments) * Math.PI * 2;
+                    row.push([
+                        Math.sin(phi) * Math.cos(theta) * 1.15,
+                        Math.cos(phi) * 1.15,
+                        Math.sin(phi) * Math.sin(theta) * 1.15
+                    ]);
+                }
+                const base = vertices.length;
+                vertices.push(...row);
+                if (r > 0) {
+                    for (let s = 0; s < segments; s += 1) {
+                        const next = (s + 1) % segments;
+                        const i0 = base - segments + s;
+                        const i1 = base - segments + next;
+                        const i2 = base + s;
+                        const i3 = base + next;
+                        edges.push([i0, i2], [i1, i3]);
+                    }
+                }
+                for (let s = 0; s < segments; s += 1) {
+                    const next = (s + 1) % segments;
+                    edges.push([base + s, base + next]);
+                }
+            }
+            return { vertices, edges };
+        };
+
+        const buildTorus = (major = 16, minor = 10) => {
+            const vertices = [];
+            const edges = [];
+            const R = 1.35;
+            const r = 0.45;
+            for (let i = 0; i < major; i += 1) {
+                const u = (i / major) * Math.PI * 2;
+                for (let j = 0; j < minor; j += 1) {
+                    const v = (j / minor) * Math.PI * 2;
+                    vertices.push([
+                        (R + r * Math.cos(v)) * Math.cos(u),
+                        r * Math.sin(v),
+                        (R + r * Math.cos(v)) * Math.sin(u)
+                    ]);
+                }
+            }
+            for (let i = 0; i < major; i += 1) {
+                for (let j = 0; j < minor; j += 1) {
+                    const curr = i * minor + j;
+                    const nextU = ((i + 1) % major) * minor + j;
+                    const nextV = i * minor + ((j + 1) % minor);
+                    edges.push([curr, nextU], [curr, nextV]);
+                }
+            }
+            return { vertices, edges };
+        };
+
+        shapeDefs.cylinder = buildCylinder();
+        shapeDefs.sphere = buildSphere();
+        shapeDefs.torus = buildTorus();
+
+        const instances = [
+            { type: "cube", nx: 0.5, ny: 0.52, size: 1.55, rx: 0.65, ry: 0.5, color: "rgba(255, 170, 90, 0.82)", width: 1.5 },
+            { type: "pyramid", nx: 0.18, ny: 0.28, size: 1.35, rx: 0.45, ry: 0.85, color: "rgba(255, 130, 200, 0.7)", width: 1.3 },
+            { type: "octahedron", nx: 0.78, ny: 0.72, size: 1.25, rx: 0.9, ry: 0.4, color: "rgba(120, 220, 255, 0.75)", width: 1.25 },
+            { type: "tetrahedron", nx: 0.22, ny: 0.78, size: 1.15, rx: 0.55, ry: 0.7, color: "rgba(180, 255, 140, 0.68)", width: 1.2 },
+            { type: "sphere", nx: 0.82, ny: 0.32, size: 1.2, rx: 0.35, ry: 0.6, color: "rgba(140, 190, 255, 0.65)", width: 1.15 },
+            { type: "torus", nx: 0.68, ny: 0.5, size: 1.1, rx: 0.75, ry: 0.95, color: "rgba(255, 210, 120, 0.62)", width: 1.1 },
+            { type: "cylinder", nx: 0.35, ny: 0.62, size: 1.05, rx: 0.5, ry: 0.35, color: "rgba(100, 240, 220, 0.6)", width: 1.1 },
+            { type: "diamond", nx: 0.58, ny: 0.22, size: 1.0, rx: 0.8, ry: 0.55, color: "rgba(200, 160, 255, 0.68)", width: 1.15 }
         ];
 
-        api.init((ctx, w, h, time) => {
-            ctx.clearRect(0, 0, w, h);
-            const t = time * 0.001;
-            const angleX = t * 0.7;
-            const angleY = t * 0.55;
+        const drawShape = (ctx, w, h, def, inst, t) => {
+            const cx = w * inst.nx;
+            const cy = h * inst.ny;
+            const angleX = t * inst.rx + inst.nx * 2;
+            const angleY = t * inst.ry + inst.ny * 2;
 
-            ctx.strokeStyle = "rgba(255, 170, 90, 0.75)";
-            ctx.lineWidth = 1.2;
-            cubeEdges.forEach(([a, b]) => {
-                const p1 = project(cubeVertices[a], w, h, angleX, angleY);
-                const p2 = project(cubeVertices[b], w, h, angleX, angleY);
+            const projected = def.vertices.map((v) => project(v, w, h, angleX, angleY, cx, cy, inst.size));
+
+            ctx.strokeStyle = inst.color;
+            ctx.lineWidth = inst.width;
+            def.edges.forEach(([a, b]) => {
+                const p1 = projected[a];
+                const p2 = projected[b];
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
                 ctx.stroke();
             });
+        };
 
-            ctx.strokeStyle = "rgba(120, 200, 255, 0.25)";
-            for (let i = 0; i < 6; i += 1) {
-                const y = h * (0.15 + i * 0.14);
+        api.init((ctx, w, h, time) => {
+            ctx.clearRect(0, 0, w, h);
+            const t = time * 0.001;
+
+            ctx.strokeStyle = "rgba(120, 200, 255, 0.14)";
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 5; i += 1) {
+                const y = h * (0.12 + i * 0.18);
                 ctx.beginPath();
-                ctx.moveTo(0, y + Math.sin(t + i) * 4);
-                ctx.lineTo(w, y + Math.cos(t * 0.8 + i) * 4);
+                ctx.moveTo(0, y + Math.sin(t * 0.6 + i) * 3);
+                ctx.lineTo(w, y + Math.cos(t * 0.5 + i) * 3);
                 ctx.stroke();
             }
+
+            instances
+                .slice()
+                .sort((a, b) => a.ny - b.ny)
+                .forEach((inst) => {
+                    const def = shapeDefs[inst.type];
+                    if (def) {
+                        drawShape(ctx, w, h, def, inst, t);
+                    }
+                });
         });
     };
 
