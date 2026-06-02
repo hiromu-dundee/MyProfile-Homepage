@@ -189,6 +189,124 @@
     color: #a5d6ff;
 }
 
+.dl-ensemble-card {
+    margin-top: 22px;
+}
+
+.dl-ensemble {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: minmax(90px, 120px) 1fr minmax(130px, 170px);
+    gap: clamp(10px, 2vw, 18px);
+    min-height: 320px;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #100a28 0%, #12183a 45%, #0a1020 100%);
+    border: 1px solid #4a3a6e;
+    box-shadow: inset 0 0 48px rgba(180, 80, 255, 0.07);
+}
+
+.dl-ensemble-network {
+    position: relative;
+    min-height: 280px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(6, 4, 18, 0.65);
+    border: 1px solid rgba(120, 80, 180, 0.35);
+}
+
+.dl-ensemble-model-tags {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.62rem;
+    color: #9aa8d0;
+    pointer-events: none;
+}
+
+.dl-ensemble-model-tags li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dl-tag {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.dl-tag--a { background: #00e5ff; color: #00e5ff; }
+.dl-tag--b { background: #ff6bcb; color: #ff6bcb; }
+.dl-tag--c { background: #ffe066; color: #ffe066; }
+
+.dl-pixel-grid--small {
+    max-width: 88px;
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.dl-model-scores {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dl-model-scores li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    color: #c6d8ff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(20, 28, 50, 0.6);
+}
+
+.dl-model-name {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.72rem;
+}
+
+.dl-model-name--a { background: rgba(0, 229, 255, 0.2); color: #00e5ff; }
+.dl-model-name--b { background: rgba(255, 107, 203, 0.2); color: #ff6bcb; }
+.dl-model-name--c { background: rgba(255, 224, 102, 0.2); color: #ffe066; }
+
+.dl-model-val {
+    font-family: "Consolas", monospace;
+    font-size: 0.72rem;
+    color: #8b9dc8;
+}
+
+.dl-ensemble-fuse-label {
+    margin-top: 4px;
+    color: #c9a8ff;
+}
+
+.dl-class-bars--ensemble .dl-bar i {
+    background: linear-gradient(90deg, #b388ff, #ff6bcb);
+}
+
+.dl-class-bars--ensemble li.is-winner .dl-bar i {
+    background: linear-gradient(90deg, #69f0ae, #00e5ff);
+    box-shadow: 0 0 12px rgba(105, 240, 174, 0.45);
+}
+
 .dl-visual-card {
     margin-top: 22px;
 }
@@ -257,5 +375,15 @@ figcaption {
 
     .dl-layer-labels {
         font-size: 0.58rem;
+    }
+
+    .dl-ensemble {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+    .dl-ensemble-network {
+        min-height: 260px;
+        order: -1;
     }
 }
