@@ -9,16 +9,17 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/deep-learning.css">
     <script src="js/script.js" defer></script>
-    <script src="js/deep-learning-hero.js" defer></script>
+    <script src="js/deep-learning.js" defer></script>
 </head>
 <body>
     <header class="hero dl-hero">
-        <canvas class="dl-hero-canvas" aria-hidden="true"></canvas>
+        <canvas class="dl-hero-canvas" data-dl-canvas="hero" aria-hidden="true"></canvas>
         <div class="container dl-hero-content">
             <h1>深層学習</h1>
-            <p>研究テーマ・取り組み・今後の展望</p>
+            <p>ニューラルネットワークによる画像認識・研究テーマ</p>
         </div>
     </header>
+
     <main class="detail-main">
         <section class="detail-card">
             <h2>アンサンブル学習の概要</h2>
@@ -27,19 +28,53 @@
             <p>最終的には、少ない計算資源でも高い性能を維持できる構成を目標に、効率性と汎化性能の両立を目指しています。</p>
         </section>
 
+        <section class="detail-card dl-pipeline-card">
+            <h2>画像認識のイメージ</h2>
+            <p>入力画像のピクセル情報が層を通過しながら特徴へ変換され、最終層でクラス確率として出力される流れを示しています。線上を走る光は、ニューロン間を伝わる信号のイメージです。</p>
+
+            <div class="dl-pipeline">
+                <div class="dl-pipeline-side dl-pipeline-input">
+                    <p class="dl-pipeline-label">入力</p>
+                    <div class="dl-pixel-grid" id="dl-pixel-grid" aria-hidden="true"></div>
+                    <p class="dl-pipeline-caption">32×32 相当の画像データ</p>
+                </div>
+
+                <div class="dl-pipeline-network">
+                    <canvas class="dl-network-canvas" data-dl-canvas="pipeline" aria-hidden="true"></canvas>
+                    <ul class="dl-layer-labels" aria-hidden="true">
+                        <li>入力層</li>
+                        <li>畳み込み</li>
+                        <li>特徴抽出</li>
+                        <li>全結合</li>
+                        <li>出力層</li>
+                    </ul>
+                </div>
+
+                <div class="dl-pipeline-side dl-pipeline-output">
+                    <p class="dl-pipeline-label">推論結果</p>
+                    <ul class="dl-class-bars" id="dl-class-bars">
+                        <li data-class="cat"><span>猫</span><span class="dl-bar"><i></i></span><span class="dl-score">—</span></li>
+                        <li data-class="dog"><span>犬</span><span class="dl-bar"><i></i></span><span class="dl-score">—</span></li>
+                        <li data-class="bird"><span>鳥</span><span class="dl-bar"><i></i></span><span class="dl-score">—</span></li>
+                    </ul>
+                    <p class="dl-pipeline-caption dl-pipeline-result" id="dl-predicted-label">認識中…</p>
+                </div>
+            </div>
+        </section>
+
         <section class="detail-card dl-visual-card">
             <h2>研究イメージ</h2>
             <div class="dl-grid">
                 <figure class="dl-item">
-                    <img src="images/NeuralNetwork.png" alt="NeuralNetwork.png">
+                    <img src="images/NeuralNetwork.png" alt="ニューラルネットワークの模式図">
                     <figcaption>ニューラルネットワーク</figcaption>
                 </figure>
                 <figure class="dl-item">
-                    <img src="images/deep_learning_neural_network_ensemble_learning_20260415134040_01.png" alt="deep_learning_neural_network_ensemble_learning_20260415134040_01.png">
+                    <img src="images/deep_learning_neural_network_ensemble_learning_20260415134040_01.png" alt="アンサンブル学習のイメージ">
                     <figcaption>研究テーマである複数のAIを組み合わせるアンサンブル学習</figcaption>
                 </figure>
                 <figure class="dl-item">
-                    <img src="images/Id_like_you_to_create_an_image_that_evokes_deep_learning_and_artificial_intell_20260415133350_02.png" alt="Id_like_you_to_create_an_image_that_evokes_deep_learning_and_artificial_intell_20260415133350_02.png">
+                    <img src="images/Id_like_you_to_create_an_image_that_evokes_deep_learning_and_artificial_intell_20260415133350_02.png" alt="人工知能のイメージ">
                     <figcaption>人工知能のイメージ</figcaption>
                 </figure>
             </div>

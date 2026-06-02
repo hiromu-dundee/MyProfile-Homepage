@@ -3,16 +3,18 @@
 .dl-hero {
     position: relative;
     overflow: hidden;
+    background: #080f1f;
+    border-bottom-color: #1e2d52;
 }
 
 .dl-hero::before {
     content: "";
     position: absolute;
     inset: -2px;
-    /* ネオンっぽい発光を少し足す */
-    background: radial-gradient(circle at 20% 30%, rgba(0, 170, 255, 0.22), transparent 55%),
-        radial-gradient(circle at 80% 20%, rgba(120, 60, 255, 0.16), transparent 50%),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.16));
+    background:
+        radial-gradient(circle at 18% 35%, rgba(0, 200, 255, 0.2), transparent 50%),
+        radial-gradient(circle at 82% 28%, rgba(180, 80, 255, 0.16), transparent 48%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.2));
     z-index: 0;
     pointer-events: none;
 }
@@ -30,6 +32,161 @@
 .dl-hero-content {
     position: relative;
     z-index: 2;
+}
+
+.dl-hero-content h1,
+.dl-hero-content p {
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}
+
+.dl-pipeline-card {
+    margin-top: 22px;
+}
+
+.dl-pipeline {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: minmax(100px, 140px) 1fr minmax(120px, 160px);
+    gap: clamp(10px, 2vw, 20px);
+    align-items: stretch;
+    min-height: 280px;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #0a1228 0%, #0d1835 50%, #0a1020 100%);
+    border: 1px solid #2a3f6e;
+    box-shadow: inset 0 0 40px rgba(0, 120, 255, 0.06);
+}
+
+.dl-pipeline-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #9ec1ff;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+}
+
+.dl-pipeline-caption {
+    margin-top: 8px;
+    font-size: 0.72rem;
+    color: #8b9dc8;
+}
+
+.dl-pipeline-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.dl-pixel-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+    aspect-ratio: 1;
+    max-width: 120px;
+    padding: 6px;
+    border-radius: 8px;
+    background: #060b16;
+    border: 1px solid #334a7a;
+    box-shadow: 0 0 20px rgba(0, 180, 255, 0.12);
+}
+
+.dl-pixel {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background: #1a2744;
+    transition: background 0.15s ease;
+}
+
+.dl-pixel.is-active {
+    background: #4fc3f7;
+    box-shadow: 0 0 6px rgba(79, 195, 247, 0.8);
+}
+
+.dl-pipeline-network {
+    position: relative;
+    min-height: 240px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(4, 8, 18, 0.6);
+    border: 1px solid rgba(60, 90, 150, 0.35);
+}
+
+.dl-network-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.dl-layer-labels {
+    position: absolute;
+    bottom: 6px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    margin: 0;
+    padding: 0 8px;
+    font-size: 0.65rem;
+    color: #6d85b8;
+    pointer-events: none;
+}
+
+.dl-class-bars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dl-class-bars li {
+    display: grid;
+    grid-template-columns: 2.2em 1fr 2.5em;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: #c6d8ff;
+}
+
+.dl-bar {
+    height: 8px;
+    border-radius: 999px;
+    background: #1a2540;
+    overflow: hidden;
+}
+
+.dl-bar i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #4f7cff, #00d4ff);
+    transition: width 0.35s ease;
+}
+
+.dl-class-bars li.is-winner .dl-bar i {
+    background: linear-gradient(90deg, #ff7b72, #ffd166);
+    box-shadow: 0 0 10px rgba(255, 180, 80, 0.5);
+}
+
+.dl-class-bars li.is-winner {
+    color: #fff;
+}
+
+.dl-score {
+    font-family: "Consolas", monospace;
+    font-size: 0.72rem;
+    color: #8b9dc8;
+    text-align: right;
+}
+
+.dl-pipeline-result {
+    font-weight: 700;
+    color: #a5d6ff;
 }
 
 .dl-visual-card {
@@ -61,17 +218,16 @@
     padding: 8px 10px;
     color: #d7e2ff;
     font-size: 0.8rem;
-    word-break: break-all;
 }
 
 figcaption {
-    text-align:center;
+    text-align: center;
 }
 
 .back-link {
-    margin : 1rem 0;
-    padding:8px 10px;
-    border:1px solid #4f7cff;
+    margin: 1rem 0;
+    padding: 8px 10px;
+    border: 1px solid #4f7cff;
     border-radius: 8px;
     color: #9ec1ff;
     text-decoration: none;
@@ -80,6 +236,26 @@ figcaption {
 }
 
 .back-link:hover {
-    color:white;
-    background:#4f7cff;
+    color: white;
+    background: #4f7cff;
+}
+
+@media (max-width: 720px) {
+    .dl-pipeline {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+    .dl-pipeline-network {
+        min-height: 220px;
+        order: -1;
+    }
+
+    .dl-pixel-grid {
+        max-width: 100px;
+    }
+
+    .dl-layer-labels {
+        font-size: 0.58rem;
+    }
 }
