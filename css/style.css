@@ -212,9 +212,17 @@ footer {
 }
 
 .back-link {
-    display: inline-block;
-    margin-top: 12px;
-    text-decoration: none;
+    margin: 1rem 0;
+    padding: 8px 10px;
+    border: 1px solid #4f7cff;
+    border-radius: 8px;
     color: #9ec1ff;
+    text-decoration: none;
     font-weight: 700;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    color: white;
+    background: #4f7cff;
 }
